@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">NavigationTest</string>
+    <string name="frankendroid_route">Frankendroid</string>
+    <string name="pumpkin_screen_route">Pumpkin</string>
+    <string name="ghost_screen_route">Ghost</string>
+    <string name="scary_bag_screen_route">ScaryBag</string>
+</resources>
