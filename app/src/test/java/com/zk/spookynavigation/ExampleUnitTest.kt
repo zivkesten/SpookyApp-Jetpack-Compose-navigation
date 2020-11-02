@@ -1,4 +1,4 @@
-package com.zk.navigationtest
+package com.zk.spookynavigation
 
 import org.junit.Test
 

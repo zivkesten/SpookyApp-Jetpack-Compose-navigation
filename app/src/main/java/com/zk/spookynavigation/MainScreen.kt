@@ -1,7 +1,8 @@
-package com.zk.navigationtest
+package com.zk.spookynavigation
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.filled.Terrain
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -38,7 +41,9 @@ sealed class ScaryAnimation(val animId: Int){
 
 @Composable
 fun MainScreen() {
+
     val navController = rememberNavController()
+
     val bottomNavigationItems = listOf(
         BottomNavigationScreens.Frankendroid,
         BottomNavigationScreens.Pumpkin,
@@ -58,26 +63,30 @@ private fun MainScreenNavigationConfigurations(
 ) {
     NavHost(navController, startDestination = BottomNavigationScreens.Frankendroid.route) {
         composable(BottomNavigationScreens.Frankendroid.route) {
-            CustomView(ScaryAnimation.Frankendroid)
+            ScaryScreen(ScaryAnimation.Frankendroid)
         }
         composable(BottomNavigationScreens.Pumpkin.route) {
-            CustomView(ScaryAnimation.Pumpkin)
+            ScaryScreen(ScaryAnimation.Pumpkin)
         }
         composable(BottomNavigationScreens.Ghost.route) {
-            CustomView(ScaryAnimation.Ghost)
+            ScaryScreen(ScaryAnimation.Ghost)
         }
         composable(BottomNavigationScreens.ScaryBag.route) {
-            CustomView(ScaryAnimation.ScaryBag)
+            ScaryScreen(ScaryAnimation.ScaryBag)
         }
     }
 }
 
 @Composable
-fun CustomView(scaryAnimation: ScaryAnimation) {
+fun ScaryScreen(
+    scaryAnimation: ScaryAnimation
+) {
     val context = ContextAmbient.current
     val customView = remember { LottieAnimationView(context) }
     // Adds view to Compose
-    AndroidView({ customView }) { view ->
+    AndroidView({ customView },
+        modifier = Modifier.background(Color.Black)
+    ) { view ->
         // View's been inflated - add logic here if necessary
         with(view) {
             setAnimation(scaryAnimation.animId)

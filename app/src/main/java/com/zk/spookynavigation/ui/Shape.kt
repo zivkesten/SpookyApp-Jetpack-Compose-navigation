@@ -1,4 +1,4 @@
-package com.zk.navigationtest.ui
+package com.zk.spookynavigation.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

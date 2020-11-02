@@ -1,4 +1,4 @@
-package com.zk.navigationtest.ui
+package com.zk.spookynavigation.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

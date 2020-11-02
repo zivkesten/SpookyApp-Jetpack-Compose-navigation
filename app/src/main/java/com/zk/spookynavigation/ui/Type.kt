@@ -1,4 +1,4 @@
-package com.zk.navigationtest.ui
+package com.zk.spookynavigation.ui
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

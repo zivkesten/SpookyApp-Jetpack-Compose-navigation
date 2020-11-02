@@ -1,13 +1,9 @@
-package com.zk.navigationtest
+package com.zk.spookynavigation
 
-import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.ui.platform.setContent
-import com.zk.navigationtest.ui.NavigationTestTheme
-import kotlinx.coroutines.FlowPreview
+import com.zk.spookynavigation.ui.NavigationTestTheme
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
