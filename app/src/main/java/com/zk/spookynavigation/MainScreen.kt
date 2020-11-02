@@ -8,15 +8,13 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChargingStation
-import androidx.compose.material.icons.filled.LocalSee
-import androidx.compose.material.icons.filled.Satellite
-import androidx.compose.material.icons.filled.Terrain
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.platform.ContextAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -25,11 +23,11 @@ import androidx.navigation.compose.*
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 
-sealed class BottomNavigationScreens(val route: String, @StringRes val resourceId: Int) {
-    object Frankendroid : BottomNavigationScreens("Frankendroid", R.string.frankendroid_route)
-    object Pumpkin : BottomNavigationScreens("Pumpkin", R.string.pumpkin_screen_route)
-    object Ghost : BottomNavigationScreens("Ghost", R.string.ghost_screen_route)
-    object ScaryBag : BottomNavigationScreens("ScaryBag", R.string.scary_bag_screen_route)
+sealed class BottomNavigationScreens(val route: String, @StringRes val resourceId: Int, val icon: VectorAsset) {
+    object Frankendroid : BottomNavigationScreens("Frankendroid", R.string.frankendroid_route, Icons.Filled.Terrain)
+    object Pumpkin : BottomNavigationScreens("Pumpkin", R.string.pumpkin_screen_route, Icons.Filled.FoodBank)
+    object Ghost : BottomNavigationScreens("Ghost", R.string.ghost_screen_route, Icons.Filled.Fireplace)
+    object ScaryBag : BottomNavigationScreens("ScaryBag", R.string.scary_bag_screen_route, Icons.Filled.Cake)
 }
 
 sealed class ScaryAnimation(val animId: Int){
@@ -51,7 +49,9 @@ fun MainScreen() {
         BottomNavigationScreens.ScaryBag
     )
     Scaffold(
-        bottomBar = { TrackShowsBottomNavigation(navController, bottomNavigationItems) },
+        bottomBar = {
+            SpookyAppBottomNavigation(navController, bottomNavigationItems)
+        },
     ) {
         MainScreenNavigationConfigurations(navController)
     }
@@ -97,7 +97,7 @@ fun ScaryScreen(
 }
 
 @Composable
-private fun TrackShowsBottomNavigation(
+private fun SpookyAppBottomNavigation(
     navController: NavHostController,
     items: List<BottomNavigationScreens>
 ) {
@@ -105,17 +105,10 @@ private fun TrackShowsBottomNavigation(
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
             BottomNavigationItem(
-                icon = {
-                    when (screen) {
-                        is BottomNavigationScreens.Frankendroid -> Icon(Icons.Filled.Terrain)
-                        is BottomNavigationScreens.Pumpkin -> Icon(Icons.Filled.Satellite)
-                        is BottomNavigationScreens.Ghost -> Icon(Icons.Filled.LocalSee)
-                        is BottomNavigationScreens.ScaryBag -> Icon(Icons.Filled.ChargingStation)
-                    }
-                },
+                icon = { Icon(screen.icon) },
                 label = { Text(stringResource(id = screen.resourceId)) },
                 selected = currentRoute == screen.route,
-                alwaysShowLabels = false,
+                alwaysShowLabels = false, // This hides the title for the unselected items
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a
                     // second instance of the composable if we are already on that destination
