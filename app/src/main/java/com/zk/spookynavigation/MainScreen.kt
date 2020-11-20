@@ -171,11 +171,14 @@ private fun SpookyAppBottomNavigation(
                         when(screen) {
                             // On the first screen we navigate with no arguments
                             is BottomNavigationScreens.Frankendroid -> {
-                                navController.navigate(screen.route)
+                                navigateWithArguments(
+                                    screen = screen,
+                                    navController = navController)
                             }
                             // On the second and third screen we navigate with the
                             // animation id integer as the argument
-                            is BottomNavigationScreens.Ghost, BottomNavigationScreens.Pumpkin -> {
+                            is BottomNavigationScreens.Pumpkin,
+                               BottomNavigationScreens.Ghost -> {
                                 navigateWithArguments(
                                     "/${screen.scaryAnimation.animId}",
                                     screen,
@@ -197,18 +200,17 @@ private fun SpookyAppBottomNavigation(
     }
 }
 
-
 private fun navigateWithArguments(
     argument: String? = null,
     screen: BottomNavigationScreens,
     navController: NavHostController
 ) {
-    argument?.also {
-        val routeWithArguments = screen.route.plus(it)
-        navController.navigate(routeWithArguments)
-    } ?: run {
-        navController.navigate(screen.route)
+    var route = screen.route
+    // If argument is supplied, navigate using that argument
+    argument?.let {
+        route = screen.route.plus(it)
     }
+    navController.navigate(route)
 }
 
 @Composable
