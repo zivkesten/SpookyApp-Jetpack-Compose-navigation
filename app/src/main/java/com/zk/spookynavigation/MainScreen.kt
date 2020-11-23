@@ -87,11 +87,17 @@ private fun MainScreenNavigationConfigurations(
     navController: NavHostController
 ) {
     NavHost(navController, startDestination = BottomNavigationScreens.Frankendroid.route) {
+        //This destination does not take any arguments
         composable(BottomNavigationScreens.Frankendroid.route) {
             ScaryScreen(ScaryAnimation.Frankendroid.animId)
         }
-
+        //This destination takes a String argument
         composable(BottomNavigationScreens.Pumpkin.route
+            .plus("/{$ANIM_INT_ID_KEY}")) {
+            ScaryScreen(ScaryAnimation.Ghost.animId)
+        }
+        //This destination takes an Integer argument
+        composable(BottomNavigationScreens.Ghost.route
             .plus("/{$ANIM_INT_ID_KEY}"),
                 arguments = listOf(navArgument(ANIM_INT_ID_KEY) {
                     type = NavType.IntType
@@ -99,12 +105,7 @@ private fun MainScreenNavigationConfigurations(
         ) { backStackEntry ->
             ScaryScreen(backStackEntry.arguments?.getInt(ANIM_INT_ID_KEY))
         }
-
-        composable(BottomNavigationScreens.Ghost.route
-            .plus("/{$ANIM_INT_ID_KEY}")) {
-            ScaryScreen(ScaryAnimation.Ghost.animId)
-        }
-
+        //This destination takes an optional string argument
         composable(
             BottomNavigationScreens.ScaryBag.route
                 .plus("?$ANIM_INT_ID_KEY={$ANIM_INT_ID_KEY}"),
@@ -159,6 +160,7 @@ private fun SpookyAppBottomNavigation(
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
             BottomNavigationItem(
+
                 icon = { Icon(screen.icon) },
                 label = { Text(stringResource(id = screen.resourceId)) },
                 selected = currentRoute == screen.route,
@@ -166,6 +168,7 @@ private fun SpookyAppBottomNavigation(
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a
                     // second instance of the composable if we are already on that destination
+
                     if (currentRoute != screen.route) {
 
                         when(screen) {
@@ -213,8 +216,19 @@ private fun navigateWithArguments(
     navController.navigate(route)
 }
 
+// In this version of the navigation implementation we had to hack a workaround to
+// obtain the current route.
+// The reason for that is that we are changing the route by contacting an argument to it
+// And so here we would remove the argument from the route.
 @Composable
 private fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+    // Here we can extract the original route from the backstack by removing the arguments from it
+    // The arguments would be added after a "/" character or a "?" character
+    val routeWithArgument = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+    // If the route with the argument was "Pumpkin/{12345}"
+    // Then the listOfStringsSplit would be ["Pumpkin", "12345"]
+    val listOfStringsSplit = routeWithArgument?.split("/","?")
+    //So we would return the first string, which would be the original route
+    return listOfStringsSplit?.get(0)
 }
