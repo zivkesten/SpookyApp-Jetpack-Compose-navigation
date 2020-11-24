@@ -27,7 +27,7 @@ import androidx.navigation.compose.*
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 
-const val ANIM_INT_ID_KEY = "scaryAnimationId"
+const val ARGUMENT_KEY = "scaryAnimationId"
 
 sealed class BottomNavigationScreens(val route: String,
                                      @StringRes val resourceId: Int,
@@ -93,34 +93,34 @@ private fun MainScreenNavigationConfigurations(
         }
         //This destination takes a String argument
         composable(BottomNavigationScreens.Pumpkin.route
-            .plus("/{$ANIM_INT_ID_KEY}")) {
-            ScaryScreen(ScaryAnimation.Ghost.animId)
+            .plus("/{$ARGUMENT_KEY}")) { backStackEntry ->
+            ScaryScreen(scaryAnimationIdAsString = backStackEntry.arguments?.getString(ARGUMENT_KEY))
         }
         //This destination takes an Integer argument
         composable(BottomNavigationScreens.Ghost.route
-            .plus("/{$ANIM_INT_ID_KEY}"),
-                arguments = listOf(navArgument(ANIM_INT_ID_KEY) {
+            .plus("/{$ARGUMENT_KEY}"),
+                arguments = listOf(navArgument(ARGUMENT_KEY) {
                     type = NavType.IntType
                 })
         ) { backStackEntry ->
-            ScaryScreen(backStackEntry.arguments?.getInt(ANIM_INT_ID_KEY))
+            val scaryAnimationId = backStackEntry.arguments?.getInt(ARGUMENT_KEY)
+            ScaryScreen(scaryAnimationId)
         }
         //This destination takes an optional string argument
         composable(
             BottomNavigationScreens.ScaryBag.route
-                .plus("?$ANIM_INT_ID_KEY={$ANIM_INT_ID_KEY}"),
-            arguments = listOf(navArgument(ANIM_INT_ID_KEY) {
+                .plus("?$ARGUMENT_KEY={$ARGUMENT_KEY}"),
+            arguments = listOf(navArgument(ARGUMENT_KEY) {
                 defaultValue = ScaryAnimation.ScaryBag.animId.toString()
             })
         ) { backStackEntry ->
-            val scaryAnimationIdAsString = backStackEntry.arguments?.getString(ANIM_INT_ID_KEY)
-            ScaryScreen(null, scaryAnimationIdAsString)
+            ScaryScreen(scaryAnimationIdAsString = backStackEntry.arguments?.getString(ARGUMENT_KEY))
         }
     }
 }
 
 @Composable
-fun ScaryScreen(scaryAnimationId: Int?, scaryAnimationIdAsString: String? = null) {
+fun ScaryScreen(scaryAnimationId: Int? = null, scaryAnimationIdAsString: String? = null) {
     //Generate animation from an integer type animationId
     scaryAnimationId?.let { animationId ->
         Animation(animationId)
@@ -157,20 +157,17 @@ private fun SpookyAppBottomNavigation(
     items: List<BottomNavigationScreens>
 ) {
     BottomNavigation {
-        val currentRoute = currentRoute(navController)
         items.forEach { screen ->
+            val isCurrentRoute = isCurrentRoute(navController, screen) ?: false
             BottomNavigationItem(
-
                 icon = { Icon(screen.icon) },
                 label = { Text(stringResource(id = screen.resourceId)) },
-                selected = currentRoute == screen.route,
+                selected = isCurrentRoute,
                 alwaysShowLabels = false, // This hides the title for the unselected items
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a
                     // second instance of the composable if we are already on that destination
-
-                    if (currentRoute != screen.route) {
-
+                    if (!isCurrentRoute) {
                         when(screen) {
                             // On the first screen we navigate with no arguments
                             is BottomNavigationScreens.Frankendroid -> {
@@ -191,7 +188,7 @@ private fun SpookyAppBottomNavigation(
                             // Of the animation id integer
                             is BottomNavigationScreens.ScaryBag -> {
                                 navigateWithArguments(
-                                    "?$ANIM_INT_ID_KEY=${ScaryAnimation.ScaryBag.animId}",
+                                    "?$ARGUMENT_KEY=${ScaryAnimation.ScaryBag.animId}",
                                     screen,
                                     navController)
                             }
@@ -216,19 +213,8 @@ private fun navigateWithArguments(
     navController.navigate(route)
 }
 
-// In this version of the navigation implementation we had to hack a workaround to
-// obtain the current route.
-// The reason for that is that we are changing the route by contacting an argument to it
-// And so here we would remove the argument from the route.
 @Composable
-private fun currentRoute(navController: NavHostController): String? {
+fun isCurrentRoute(navController: NavHostController, screen: BottomNavigationScreens): Boolean? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    // Here we can extract the original route from the backstack by removing the arguments from it
-    // The arguments would be added after a "/" character or a "?" character
-    val routeWithArgument = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
-    // If the route with the argument was "Pumpkin/{12345}"
-    // Then the listOfStringsSplit would be ["Pumpkin", "12345"]
-    val listOfStringsSplit = routeWithArgument?.split("/","?")
-    //So we would return the first string, which would be the original route
-    return listOfStringsSplit?.get(0)
+    return navBackStackEntry?.arguments?.getString(KEY_ROUTE)?.contains(screen.route)
 }
