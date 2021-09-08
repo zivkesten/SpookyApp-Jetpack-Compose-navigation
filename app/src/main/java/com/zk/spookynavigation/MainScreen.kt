@@ -1,12 +1,8 @@
 package com.zk.spookynavigation
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.background
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
@@ -14,8 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
@@ -23,7 +19,7 @@ import androidx.navigation.compose.*
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 
-sealed class BottomNavigationScreens(val route: String, @StringRes val resourceId: Int, val icon: VectorAsset) {
+sealed class BottomNavigationScreens(val route: String, @StringRes val resourceId: Int, val icon: ImageVector) {
     object Frankendroid : BottomNavigationScreens("Frankendroid", R.string.frankendroid_route, Icons.Filled.Terrain)
     object Pumpkin : BottomNavigationScreens("Pumpkin", R.string.pumpkin_screen_route, Icons.Filled.FoodBank)
     object Ghost : BottomNavigationScreens("Ghost", R.string.ghost_screen_route, Icons.Filled.Fireplace)
@@ -81,7 +77,7 @@ private fun MainScreenNavigationConfigurations(
 fun ScaryScreen(
     scaryAnimation: ScaryAnimation
 ) {
-    val context = ContextAmbient.current
+    val context = LocalContext.current
     val customView = remember { LottieAnimationView(context) }
     // Adds view to Compose
     AndroidView({ customView },
@@ -104,11 +100,12 @@ private fun SpookyAppBottomNavigation(
     BottomNavigation {
         val currentRoute = currentRoute(navController)
         items.forEach { screen ->
+            val description = stringResource(id = screen.resourceId)
             BottomNavigationItem(
-                icon = { Icon(screen.icon) },
-                label = { Text(stringResource(id = screen.resourceId)) },
+                icon = { Icon(screen.icon, description) },
+                label = { Text(description) },
                 selected = currentRoute == screen.route,
-                alwaysShowLabels = false, // This hides the title for the unselected items
+                alwaysShowLabel = false, // This hides the title for the unselected items
                 onClick = {
                     // This if check gives us a "singleTop" behavior where we do not create a
                     // second instance of the composable if we are already on that destination
@@ -124,5 +121,5 @@ private fun SpookyAppBottomNavigation(
 @Composable
 private fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.arguments?.getString(KEY_ROUTE)
+    return navBackStackEntry?.destination?.route
 }

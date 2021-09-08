@@ -14,7 +14,9 @@
         <activity
             android:name="com.zk.spookynavigation.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.NavigationTest.NoActionBar">
+            android:theme="@style/Theme.NavigationTest.NoActionBar"
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
