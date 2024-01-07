@@ -7,7 +7,9 @@
 - **Bottom Bar Navigation** 🧭: Integrating a user-friendly bottom navigation bar with Jetpack Compose.
 - **Compose Navigation** 🚀: Implementing smooth navigation logic in a modern UI.
 
-![Bottom Navigation Demo]([URL-of-your-GIF](https://github.com/zivkesten/SpookyApp-Jetpack-Compose-navigation/blob/master/demo_gif.gif))
+## Demo
+<img src="https://github.com/zivkesten/SpookyApp-Jetpack-Compose-navigation/blob/master/demo_gif.gif" width="250">
+
 
 ## Getting Started
 1. Clone this repository 📥.
